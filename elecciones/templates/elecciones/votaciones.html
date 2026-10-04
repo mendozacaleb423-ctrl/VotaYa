@@ -1,0 +1,138 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Votaciones | VotaYa</title>
+    <link rel="stylesheet" href="{% static 'css/estilos.css' %}">
+</head>
+<body>
+
+<header class="navbar">
+    <a class="logo" href="{% url 'elecciones:inicio' %}">
+        <span class="logo-icon">✓</span> VotaYa
+    </a>
+
+    <nav>
+        <a href="{% url 'elecciones:inicio' %}">Inicio</a>
+        <a href="{% url 'elecciones:lista_votaciones' %}">Votaciones</a>
+
+        {# Acceso directo mediante código #}
+        <a href="{% url 'elecciones:ingresar_codigo' %}" class="nav-code-link">🔑 Votar con Código</a>
+
+        {% if user.is_authenticated %}
+            <span class="user-welcome">
+                Hola, {{ user.username }}
+            </span>
+
+            <form method="post" action="{% url 'elecciones:cerrar_sesion' %}" class="logout-form">
+                {% csrf_token %}
+                <button type="submit" class="btn btn-secondary">
+                    Cerrar sesión
+                </button>
+            </form>
+        {% else %}
+            <a href="{% url 'elecciones:iniciar_sesion' %}">Iniciar sesión</a>
+            <a class="btn btn-primary" href="{% url 'elecciones:registro' %}">
+                Registrarse
+            </a>
+        {% endif %}
+    </nav>
+</header>
+
+{% if messages %}
+    <div class="messages-container">
+        {% for message in messages %}
+            <div class="message {{ message.tags }}">
+                {{ message }}
+            </div>
+        {% endfor %}
+    </div>
+{% endif %}
+
+<main class="listing-page">
+    <div class="section-heading">
+        <span class="eyebrow">PARTICIPA Y DECIDE</span>
+        <h1>Votaciones disponibles</h1>
+        <p>Consulta las votaciones activas, ingresa tus códigos de acceso o revisa resultados.</p>
+    </div>
+
+    <div class="poll-grid">
+        {% for votacion in votaciones %}
+            <article class="poll-card">
+
+                <span class="poll-status">
+                    ● {% if votacion.activa %}Disponible{% else %}No activa{% endif %}
+                </span>
+
+                <h3>{{ votacion.titulo }}</h3>
+
+                <p>{{ votacion.descripcion }}</p>
+
+                <p class="poll-date">
+                    Inicio: {{ votacion.fecha_inicio|date:"d/m/Y H:i" }}
+                </p>
+
+                <p class="poll-date">
+                    Cierre: {{ votacion.fecha_fin|date:"d/m/Y H:i" }}
+                </p>
+
+                <p class="muted">
+                    {{ votacion.opciones.count }} opciones disponibles
+                </p>
+
+                {% if votacion.codigo_acceso %}
+                    <div class="code-badge-box">
+                        <small class="code-badge-label">Código de acceso público:</small>
+                        <strong class="code-badge-value">{{ votacion.codigo_acceso }}</strong>
+                    </div>
+                {% endif %}
+
+                {% if votacion.activa %}
+                    <a class="btn btn-primary"
+                       href="{% url 'elecciones:votar_participante' votacion.codigo_acceso %}">
+                        Participar en la votación →
+                    </a>
+                {% else %}
+                    <p class="notice">
+                        Esta votación no está activa en este momento.
+                    </p>
+                {% endif %}
+
+                <a class="btn btn-secondary btn-results"
+                   href="{% url 'elecciones:resultados_por_codigo' votacion.codigo_acceso %}">
+                    Consultar resultados
+                </a>
+
+            </article>
+        {% empty %}
+            <div class="empty-state">
+                <div class="empty-icon">☑️</div>
+                <h3>No hay votaciones disponibles</h3>
+                <p>Pronto podrás consultar nuevas votaciones o ingresar un código directamente.</p>
+
+                <div class="empty-state-actions">
+                    <a class="btn btn-primary" href="{% url 'elecciones:ingresar_codigo' %}">
+                        Ingresar Código
+                    </a>
+                    <a class="btn btn-secondary" href="{% url 'elecciones:inicio' %}">
+                        Volver al inicio
+                    </a>
+                </div>
+            </div>
+        {% endfor %}
+    </div>
+</main>
+
+<footer>
+    <a class="logo footer-logo" href="{% url 'elecciones:inicio' %}">
+        <span class="logo-icon">✓</span> VotaYa
+    </a>
+
+    <p>Tu voz cuenta. Tu participación importa.</p>
+    <small>© 2026 VotaYa · Proyecto académico</small>
+</footer>
+
+</body>
+</html>

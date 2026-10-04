@@ -1,0 +1,125 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Resultados | VotaYa</title>
+    <link rel="stylesheet" href="{% static 'css/estilos.css' %}">
+</head>
+<body>
+<header class="navbar">
+    <a class="logo" href="{% url 'elecciones:inicio' %}">
+        <span class="logo-icon">✓</span> VotaYa
+    </a>
+    <nav>
+        <a href="{% url 'elecciones:inicio' %}">Inicio</a>
+        <a href="{% url 'elecciones:lista_votaciones' %}">Votaciones</a>
+        <a href="{% url 'elecciones:ingresar_codigo' %}" style="font-weight: bold; color: #2563eb;">🔑 Votar con Código</a>
+    </nav>
+</header>
+
+<main class="form-page results-page">
+    <section class="form-card results-card">
+        <span class="eyebrow">RESULTADOS EN TIEMPO REAL</span>
+        <h1>{{ votacion.titulo }}</h1>
+        <p>{{ votacion.descripcion }}</p>
+
+        <!-- SECCIÓN CÓDIGO DE ACCESO Y CÓDIGO QR -->
+        <div class="qr-container" style="margin: 20px 0; padding: 15px; border: 1px solid #e2e8f0; border-radius: 8px; text-align: center; background-color: #f8fafc;">
+            <h3>Escanea para votar</h3>
+            <p style="margin-bottom: 10px;">Código de acceso: <strong style="font-size: 1.2rem; letter-spacing: 1px; color: #2563eb;">{{ votacion.codigo_acceso }}</strong></p>
+            
+            {% if votacion.qr_code %}
+                <img src="{{ votacion.qr_code.url }}" alt="Código QR de Votación" style="max-width: 180px; height: auto; border: 1px solid #ddd; padding: 5px; background: #fff; border-radius: 4px;">
+            {% endif %}
+        </div>
+
+        <div class="total-votes">
+            <strong id="total-votos">{{ total_votos }}</strong>
+            <span>voto{{ total_votos|pluralize:"s" }} registrado{{ total_votos|pluralize:"s" }}</span>
+        </div>
+
+        {% for resultado in resultados %}
+            <div class="result-item">
+                <div class="result-label">
+                    <strong>{{ resultado.opcion.texto }}</strong>
+                    <span id="votos-opcion-{{ resultado.opcion.id }}">{{ resultado.cantidad }} voto{{ resultado.cantidad|pluralize:"s" }}</span>
+                </div>
+
+                <div class="result-track">
+                    <div class="result-fill barra-dinamica"
+                         id="barra-opcion-{{ resultado.opcion.id }}"
+                         data-porcentaje="{{ resultado.porcentaje }}">
+                    </div>
+                </div>
+
+                <p class="result-percentage" id="porcentaje-opcion-{{ resultado.opcion.id }}">
+                    {{ resultado.porcentaje|floatformat:1 }}%
+                </p>
+            </div>
+        {% empty %}
+            <p>Aún no hay opciones registradas.</p>
+        {% endfor %}
+
+        <div style="margin-top: 20px; display: flex; gap: 10px;">
+            <a class="btn btn-secondary" href="{% url 'elecciones:lista_votaciones' %}">
+                Volver a las votaciones
+            </a>
+        </div>
+    </section>
+</main>
+
+<footer>
+    <p>© 2026 VotaYa · Tu voz cuenta.</p>
+</footer>
+
+<script>
+document.addEventListener("DOMContentLoaded", function() {
+    // Aplicar ancho inicial a las barras dinámicas
+    document.querySelectorAll('.barra-dinamica').forEach(function(barra) {
+        const pct = barra.getAttribute('data-porcentaje');
+        if (pct) {
+            barra.style.width = pct + '%';
+        }
+    });
+
+    const codigoVotacion = "{{ votacion.codigo_acceso }}";
+
+    function actualizarResultados() {
+        if (!codigoVotacion) return;
+
+        // Construir la URL dynamic usando la vista name declarada en urls.py
+        const urlApi = "{% url 'elecciones:api_resultados' 'CODIGO_PLACEHOLDER' %}".replace('CODIGO_PLACEHOLDER', codigoVotacion);
+
+        fetch(urlApi)
+            .then(function(response) {
+                if (!response.ok) throw new Error("Error en la respuesta de la API");
+                return response.json();
+            })
+            .then(function(data) {
+                const elemTotal = document.getElementById('total-votos');
+                if (elemTotal) elemTotal.innerText = data.total_votos;
+
+                data.resultados.forEach(function(item) {
+                    const elemCantidad = document.getElementById('votos-opcion-' + item.id);
+                    const elemPorcentaje = document.getElementById('porcentaje-opcion-' + item.id);
+                    const elemBarra = document.getElementById('barra-opcion-' + item.id);
+
+                    if (elemCantidad) elemCantidad.innerText = item.cantidad + (item.cantidad === 1 ? ' voto' : ' votos');
+                    if (elemPorcentaje) elemPorcentaje.innerText = item.porcentaje + '%';
+                    if (elemBarra) elemBarra.style.width = item.porcentaje + '%';
+                });
+            })
+            .catch(function(err) {
+                console.error("Error al refrescar resultados en tiempo real:", err);
+            });
+    }
+
+    // Polling cada 3 segundos
+    setInterval(actualizarResultados, 3000);
+});
+</script>
+
+</body>
+</html>

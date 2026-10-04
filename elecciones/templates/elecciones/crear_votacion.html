@@ -1,0 +1,507 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Crear encuesta | VotaYa</title>
+    <link rel="stylesheet" href="{% static 'css/estilos.css' %}">
+
+    <style>
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 0;
+            background: #f4f7fc;
+            color: #17233c;
+            font-family: "Segoe UI", Arial, sans-serif;
+        }
+
+        .navbar {
+            min-height: 76px;
+            padding: 15px 6%;
+            background: #fff;
+            border-bottom: 1px solid #e8edf5;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 20px;
+            flex-wrap: wrap;
+        }
+
+        .logo {
+            color: #2446a8;
+            font-size: 25px;
+            font-weight: 800;
+            text-decoration: none;
+        }
+
+        .logo-icon {
+            display: inline-flex;
+            width: 34px;
+            height: 34px;
+            justify-content: center;
+            align-items: center;
+            color: #fff;
+            background: #315bea;
+            border-radius: 11px;
+        }
+
+        .navbar nav {
+            display: flex;
+            align-items: center;
+            gap: 22px;
+            flex-wrap: wrap;
+        }
+
+        .navbar nav a {
+            color: #526079;
+            text-decoration: none;
+            font-size: 14px;
+            font-weight: 600;
+        }
+
+        .navbar nav a:hover {
+            color: #315bea;
+        }
+
+        .user-pill {
+            background: #edf2ff;
+            color: #3150b7;
+            border-radius: 30px;
+            padding: 9px 14px;
+            font-size: 13px;
+            font-weight: 600;
+        }
+
+        .page {
+            max-width: 1100px;
+            margin: 42px auto;
+            padding: 0 22px 50px;
+        }
+
+        .intro {
+            margin-bottom: 28px;
+        }
+
+        .eyebrow {
+            display: inline-block;
+            color: #315bea;
+            background: #e9efff;
+            padding: 7px 12px;
+            border-radius: 20px;
+            font-size: 11px;
+            font-weight: 800;
+            letter-spacing: 1.2px;
+        }
+
+        .intro h1 {
+            margin: 16px 0 9px;
+            font-size: clamp(28px, 4vw, 38px);
+            letter-spacing: -1px;
+            color: #182542;
+        }
+
+        .intro p {
+            color: #758099;
+            line-height: 1.7;
+            margin: 0;
+        }
+
+        .layout {
+            display: grid;
+            grid-template-columns: minmax(0, 1fr) 290px;
+            gap: 24px;
+            align-items: start;
+        }
+
+        .form-card, .side-card {
+            background: #fff;
+            border: 1px solid #e8edf5;
+            border-radius: 18px;
+            box-shadow: 0 12px 35px rgba(32, 54, 100, 0.06);
+        }
+
+        .form-card {
+            padding: 30px;
+        }
+
+        .card-heading {
+            padding-bottom: 22px;
+            margin-bottom: 24px;
+            border-bottom: 1px solid #edf0f6;
+        }
+
+        .card-heading h2 {
+            margin: 0 0 8px;
+            font-size: 20px;
+        }
+
+        .card-heading p {
+            margin: 0;
+            color: #8791a6;
+            font-size: 14px;
+        }
+
+        .field {
+            margin-bottom: 23px;
+        }
+
+        .field label {
+            display: block;
+            margin-bottom: 9px;
+            color: #273652;
+            font-weight: 700;
+            font-size: 14px;
+        }
+
+        .field input,
+        .field textarea,
+        .field select {
+            display: block;
+            width: 100%;
+            padding: 13px 14px;
+            border: 1px solid #dce3ef;
+            border-radius: 10px;
+            background: #fbfcff;
+            color: #24324b;
+            font: inherit;
+            font-size: 14px;
+            outline: none;
+            transition: border-color .2s, box-shadow .2s;
+        }
+
+        .field input:focus,
+        .field textarea:focus,
+        .field select:focus {
+            border-color: #5276f5;
+            box-shadow: 0 0 0 3px rgba(82, 118, 245, .12);
+            background: #fff;
+        }
+
+        .field textarea {
+            min-height: 100px;
+            resize: vertical;
+        }
+
+        .field .helptext {
+            display: block;
+            margin-top: 8px;
+            color: #8791a6;
+            font-size: 12px;
+        }
+
+        .field ul.errorlist {
+            padding-left: 18px;
+            color: #d33e52;
+            font-size: 13px;
+        }
+
+        .date-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 18px;
+        }
+
+        .options-hint {
+            margin-top: 9px;
+            padding: 12px 14px;
+            background: #f1f5ff;
+            color: #53658d;
+            border-radius: 9px;
+            font-size: 12px;
+            line-height: 1.6;
+        }
+
+        .actions {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            flex-wrap: wrap;
+            padding-top: 8px;
+        }
+
+        .btn {
+            display: inline-flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 44px;
+            padding: 12px 19px;
+            border: 0;
+            border-radius: 10px;
+            font: inherit;
+            font-size: 14px;
+            font-weight: 700;
+            text-decoration: none;
+            cursor: pointer;
+            transition: transform .2s, background .2s;
+        }
+
+        .btn:hover {
+            transform: translateY(-1px);
+        }
+
+        .btn-primary {
+            color: #fff;
+            background: #315bea;
+            box-shadow: 0 6px 14px rgba(49, 91, 234, .18);
+        }
+
+        .btn-primary:hover {
+            background: #2448ca;
+        }
+
+        .btn-secondary {
+            color: #536079;
+            background: #eef1f7;
+        }
+
+        .side-card {
+            padding: 24px;
+        }
+
+        .side-icon {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 48px;
+            height: 48px;
+            margin-bottom: 18px;
+            border-radius: 14px;
+            background: #eaf0ff;
+            font-size: 23px;
+        }
+
+        .side-card h3 {
+            margin: 0 0 10px;
+            font-size: 18px;
+        }
+
+        .side-card > p {
+            color: #7b879e;
+            font-size: 13px;
+            line-height: 1.7;
+        }
+
+        .tip {
+            display: flex;
+            gap: 11px;
+            margin-top: 20px;
+            padding-top: 17px;
+            border-top: 1px solid #edf0f6;
+        }
+
+        .tip-mark {
+            color: #315bea;
+            font-weight: 800;
+        }
+
+        .tip p {
+            margin: 0;
+            color: #66738c;
+            font-size: 12px;
+            line-height: 1.6;
+        }
+
+        .messages-container {
+            max-width: 1056px;
+            margin: 20px auto 0;
+            padding: 0 22px;
+        }
+
+        .message {
+            padding: 13px 16px;
+            margin-bottom: 10px;
+            border-radius: 10px;
+            background: #e8f8ee;
+            color: #176c3a;
+        }
+
+        .message.error {
+            background: #fff0f0;
+            color: #a82936;
+        }
+
+        footer {
+            padding: 25px;
+            text-align: center;
+            color: #8b95a9;
+            font-size: 12px;
+        }
+
+        @media (max-width: 800px) {
+            .layout {
+                grid-template-columns: 1fr;
+            }
+
+            .side-card {
+                order: -1;
+            }
+
+            .navbar {
+                padding: 16px 5%;
+            }
+
+            .navbar nav {
+                gap: 14px;
+            }
+        }
+
+        @media (max-width: 520px) {
+            .page {
+                margin-top: 28px;
+                padding: 0 14px 35px;
+            }
+
+            .form-card {
+                padding: 21px 17px;
+            }
+
+            .date-grid {
+                grid-template-columns: 1fr;
+                gap: 0;
+            }
+
+            .navbar nav {
+                width: 100%;
+            }
+
+            .actions .btn {
+                width: 100%;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+<header class="navbar">
+    <a class="logo" href="{% url 'elecciones:inicio' %}">
+        <span class="logo-icon">✓</span> VotaYa
+    </a>
+
+    <nav>
+        <a href="{% url 'elecciones:inicio' %}">Inicio</a>
+        <a href="{% url 'elecciones:lista_votaciones' %}">Votaciones</a>
+        <a href="{% url 'elecciones:ingresar_codigo' %}">Votar con código</a>
+        <span class="user-pill">● {{ user.username }}</span>
+    </nav>
+</header>
+
+{% if messages %}
+    <div class="messages-container">
+        {% for message in messages %}
+            <div class="message {{ message.tags }}">{{ message }}</div>
+        {% endfor %}
+    </div>
+{% endif %}
+
+<main class="page">
+
+    <section class="intro">
+        <span class="eyebrow">PANEL DEL ORGANIZADOR</span>
+        <h1>Crea tu encuesta</h1>
+        <p>Prepara una nueva votación y comparte tu código de acceso con los participantes.</p>
+    </section>
+
+    <div class="layout">
+
+        <section class="form-card">
+            <div class="card-heading">
+                <h2>Información de la encuesta</h2>
+                <p>Completa los campos para configurar tu votación.</p>
+            </div>
+
+            <form method="post">
+                {% csrf_token %}
+
+                {% if form.non_field_errors %}
+                    <div class="message error">
+                        {{ form.non_field_errors }}
+                    </div>
+                {% endif %}
+
+                <div class="field">
+                    <label for="{{ form.titulo.id_for_label }}">Título de la encuesta</label>
+                    {{ form.titulo }}
+                    {{ form.titulo.errors }}
+                </div>
+
+                <div class="field">
+                    <label for="{{ form.descripcion.id_for_label }}">Descripción</label>
+                    {{ form.descripcion }}
+                    {{ form.descripcion.errors }}
+                </div>
+
+                <div class="date-grid">
+                    <div class="field">
+                        <label for="{{ form.fecha_inicio.id_for_label }}">Fecha de inicio</label>
+                        {{ form.fecha_inicio }}
+                        {{ form.fecha_inicio.errors }}
+                    </div>
+
+                    <div class="field">
+                        <label for="{{ form.fecha_fin.id_for_label }}">Fecha de cierre</label>
+                        {{ form.fecha_fin }}
+                        {{ form.fecha_fin.errors }}
+                    </div>
+                </div>
+
+                <div class="field">
+                    <label for="{{ form.opciones.id_for_label }}">Opciones de respuesta</label>
+                    {{ form.opciones }}
+                    {{ form.opciones.errors }}
+                    <div class="options-hint">
+                        💡 Escribe cada respuesta en una línea diferente.
+                        Necesitas al menos dos opciones para crear la encuesta.
+                    </div>
+                </div>
+
+                <div class="actions">
+                    <button type="submit" class="btn btn-primary">
+                        ✓ Crear encuesta
+                    </button>
+
+                    <a class="btn btn-secondary"
+                       href="{% url 'elecciones:inicio' %}">
+                        Cancelar
+                    </a>
+                </div>
+            </form>
+        </section>
+
+        <aside class="side-card">
+            <div class="side-icon">📊</div>
+            <h3>Tu opinión, organizada</h3>
+            <p>
+                Crea una encuesta clara para que las personas puedan
+                participar fácilmente desde VotaYa.
+            </p>
+
+            <div class="tip">
+                <span class="tip-mark">01</span>
+                <p><strong>Un buen título</strong><br>Explica brevemente qué quieres consultar.</p>
+            </div>
+
+            <div class="tip">
+                <span class="tip-mark">02</span>
+                <p><strong>Opciones claras</strong><br>Escribe respuestas sencillas y fáciles de entender.</p>
+            </div>
+
+            <div class="tip">
+                <span class="tip-mark">03</span>
+                <p><strong>Define el horario</strong><br>Configura cuándo comienza y termina la votación.</p>
+            </div>
+        </aside>
+
+    </div>
+</main>
+
+<footer>
+    © 2026 VotaYa · Tu voz cuenta, tu participación importa.
+</footer>
+
+</body>
+</html>

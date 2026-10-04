@@ -1,0 +1,77 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ingresar Código | VotaYa</title>
+    <link rel="stylesheet" href="{% static 'css/estilos.css' %}">
+</head>
+<body>
+
+<header class="navbar">
+    <a class="logo" href="{% url 'elecciones:inicio' %}">
+        <span class="logo-icon">✓</span> VotaYa
+    </a>
+    <nav>
+        <a href="{% url 'elecciones:inicio' %}">Inicio</a>
+        <a href="{% url 'elecciones:lista_votaciones' %}">Votaciones</a>
+        {% if user.is_authenticated %}
+            <form method="post" action="{% url 'elecciones:cerrar_sesion' %}" style="display:inline;">
+                {% csrf_token %}
+                <button type="submit" class="btn btn-secondary">Cerrar sesión</button>
+            </form>
+        {% else %}
+            <a href="{% url 'elecciones:iniciar_sesion' %}">Iniciar sesión</a>
+            <a class="btn btn-primary" href="{% url 'elecciones:registro' %}">Registrarse</a>
+        {% endif %}
+    </nav>
+</header>
+
+{% if messages %}
+    <div class="messages-container">
+        {% for message in messages %}
+            <div class="message {{ message.tags }}">
+                {{ message }}
+            </div>
+        {% endfor %}
+    </div>
+{% endif %}
+
+<main class="auth-page">
+    <div class="auth-card">
+        <h2>🔑 Acceso con Código</h2>
+        <p>Ingresa el código único de la votación para participar o consultar sus resultados.</p>
+
+        <form method="post" class="form-grid">
+            {% csrf_token %}
+            
+            <div class="form-group">
+                <label for="{{ form.codigo.id_for_label }}">Código de Acceso:</label>
+                {{ form.codigo }}
+                {% if form.codigo.errors %}
+                    <span class="error-text">{{ form.codigo.errors.0 }}</span>
+                {% endif %}
+            </div>
+
+            <button type="submit" class="btn btn-primary btn-block">
+                Ingresar a la Votación
+            </button>
+        </form>
+
+        <div class="auth-footer">
+            <a href="{% url 'elecciones:lista_votaciones' %}">← Volver a la lista de votaciones</a>
+        </div>
+    </div>
+</main>
+
+<footer>
+    <a class="logo footer-logo" href="{% url 'elecciones:inicio' %}">
+        <span class="logo-icon">✓</span> VotaYa
+    </a>
+    <p>Tu voz cuenta. Tu participación importa.</p>
+    <small>© 2026 VotaYa · Proyecto académico</small>
+</footer>
+
+</body>
+</html>

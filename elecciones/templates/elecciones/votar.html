@@ -1,0 +1,74 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Emitir voto | VotaYa</title>
+    <link rel="stylesheet" href="{% static 'css/estilos.css' %}">
+</head>
+<body>
+<header class="navbar">
+    <a class="logo" href="{% url 'elecciones:inicio' %}">
+        <span class="logo-icon">✓</span> VotaYa
+    </a>
+    <nav>
+        <a href="{% url 'elecciones:lista_votaciones' %}">Votaciones</a>
+    </nav>
+</header>
+
+<main class="form-page">
+    <section class="form-card vote-form-card">
+        <span class="eyebrow">TU PARTICIPACIÓN IMPORTA</span>
+        <h1>{{ votacion.titulo }}</h1>
+        <p>{{ votacion.descripcion }}</p>
+
+        {% if messages %}
+            <div class="messages-container">
+                {% for message in messages %}
+                    <div class="alert alert-{{ message.tags }}">
+                        {{ message }}
+                    </div>
+                {% endfor %}
+            </div>
+        {% endif %}
+
+        <form method="post" action="{% url 'elecciones:votar_participante' votacion.codigo_acceso %}">
+            {% csrf_token %}
+
+            <fieldset class="options-fieldset">
+                <legend>Selecciona una opción</legend>
+
+                {% for opcion in opciones %}
+                    <label class="vote-option">
+                        <input
+                            type="radio"
+                            name="opcion"
+                            value="{{ opcion.id }}"
+                            required
+                        >
+                        <span>{{ opcion.texto }}</span>
+                    </label>
+                {% empty %}
+                    <p>Esta votación todavía no tiene opciones.</p>
+                {% endfor %}
+            </fieldset>
+
+            {% if opciones %}
+                <button type="submit" class="btn btn-primary form-submit">
+                    Confirmar mi voto
+                </button>
+            {% endif %}
+        </form>
+
+        <p class="form-bottom">
+            Revisa tu selección antes de confirmar.
+        </p>
+    </section>
+</main>
+
+<footer>
+    <p>© 2026 VotaYa · Tu voz cuenta.</p>
+</footer>
+</body>
+</html>

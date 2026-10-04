@@ -1,0 +1,248 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>VotaYa | Tu voz cuenta</title>
+    <link rel="stylesheet" href="{% static 'css/estilos.css' %}">
+</head>
+<body>
+
+<header class="navbar">
+    <a class="logo" href="{% url 'elecciones:inicio' %}">
+        <span class="logo-icon">✓</span> VotaYa
+    </a>
+
+    <nav>
+        <a href="{% url 'elecciones:inicio' %}">Inicio</a>
+        <a href="{% url 'elecciones:lista_votaciones' %}">Votaciones</a>
+
+        <a href="{% url 'elecciones:ingresar_codigo' %}"
+           style="font-weight: bold; color: #2563eb;">
+            🔑 Votar con Código
+        </a>
+
+        {% if user.is_authenticated %}
+            <a class="btn btn-primary"
+               href="{% url 'elecciones:crear_votacion' %}">
+                + Crear encuesta
+            </a>
+
+            <span class="user-welcome">
+                Hola, {{ user.username }}
+            </span>
+
+            <form method="post"
+                  action="{% url 'elecciones:cerrar_sesion' %}"
+                  class="logout-form">
+                {% csrf_token %}
+                <button type="submit" class="btn btn-secondary">
+                    Cerrar sesión
+                </button>
+            </form>
+        {% else %}
+            <a href="{% url 'elecciones:iniciar_sesion' %}">
+                Iniciar sesión
+            </a>
+
+            <a class="btn btn-primary"
+               href="{% url 'elecciones:registro' %}">
+                Registrarse
+            </a>
+        {% endif %}
+    </nav>
+</header>
+
+{% if messages %}
+    <div class="messages-container">
+        {% for message in messages %}
+            <div class="message {{ message.tags }}">
+                {{ message }}
+            </div>
+        {% endfor %}
+    </div>
+{% endif %}
+
+<main>
+    <section class="hero">
+        <div class="hero-text">
+            <span class="eyebrow">PARTICIPA · OPINA · DECIDE</span>
+
+            <h1>
+                Tu opinión tiene<br>
+                el poder de <span>cambiar.</span>
+            </h1>
+
+            <p>
+                Participa en votaciones de manera sencilla.
+                Tu voz importa y cada participación cuenta.
+            </p>
+
+            <div style="display: flex; gap: 12px; flex-wrap: wrap;">
+                <a class="btn btn-primary"
+                   href="{% url 'elecciones:lista_votaciones' %}">
+                    Explorar votaciones →
+                </a>
+
+                <a class="btn btn-secondary"
+                   href="{% url 'elecciones:ingresar_codigo' %}">
+                    Ingresar Código
+                </a>
+
+                {% if user.is_authenticated %}
+                    <a class="btn btn-primary"
+                       href="{% url 'elecciones:crear_votacion' %}">
+                        + Crear encuesta
+                    </a>
+                {% endif %}
+            </div>
+
+            <div class="hero-note" style="margin-top: 15px;">
+                <span class="check-circle">✓</span>
+                Una plataforma sencilla para participar.
+            </div>
+        </div>
+
+        <div class="hero-visual">
+            <div class="visual-circle"></div>
+
+            <div class="vote-card">
+                <div class="card-top">
+                    <span class="mini-icon">🔑</span>
+                    <span class="status">ACCESO RÁPIDO</span>
+                </div>
+
+                <h3>¿Tienes un código?</h3>
+                <p>
+                    Ingresa el código de 8 caracteres de tu votación
+                    para participar directamente.
+                </p>
+
+                <form method="POST"
+                      action="{% url 'elecciones:ingresar_codigo' %}"
+                      style="display: flex; flex-direction: column; gap: 10px; margin-top: 10px;">
+                    {% csrf_token %}
+
+                    <input type="text"
+                           name="codigo"
+                           placeholder="Ej: A1B2C3D4"
+                           maxlength="8"
+                           required
+                           style="padding: 10px; border-radius: 8px; border: 1px solid #ccc; text-transform: uppercase; text-align: center; font-weight: bold; font-size: 1.1rem; letter-spacing: 2px;">
+
+                    <button type="submit"
+                            class="btn btn-primary"
+                            style="width: 100%; border: none; cursor: pointer;">
+                        Ingresar a Votar
+                    </button>
+                </form>
+            </div>
+
+            <div class="floating-badge">
+                <span>✓</span>
+                Participa hoy
+            </div>
+        </div>
+    </section>
+
+    <section class="features">
+        <div class="section-heading">
+            <span class="eyebrow">VOTAYA</span>
+            <h2>Participar es más fácil</h2>
+            <p>
+                Todo lo que necesitas para encontrar y consultar votaciones.
+            </p>
+        </div>
+
+        <div class="feature-grid">
+            <article class="feature-card">
+                <div class="feature-icon blue">✓</div>
+                <h3>Fácil de usar</h3>
+                <p>
+                    Encuentra las votaciones disponibles desde un solo lugar.
+                </p>
+            </article>
+
+            <article class="feature-card">
+                <div class="feature-icon purple">◎</div>
+                <h3>Tu voz importa</h3>
+                <p>
+                    Participa y expresa tu preferencia en cada votación.
+                </p>
+            </article>
+
+            <article class="feature-card">
+                <div class="feature-icon green">▥</div>
+                <h3>Consulta resultados</h3>
+                <p>
+                    Conoce los resultados de las votaciones habilitadas.
+                </p>
+            </article>
+        </div>
+    </section>
+
+    <section class="poll-section">
+        <div class="section-heading">
+            <span class="eyebrow">PARTICIPA</span>
+            <h2>Votaciones disponibles</h2>
+            <p>
+                Explora las votaciones que se encuentran abiertas.
+            </p>
+        </div>
+
+        <div class="poll-grid">
+            {% for votacion in votaciones %}
+                <article class="poll-card">
+                    <span class="poll-status">
+                        ● {% if votacion.activa %}Disponible{% else %}No activa{% endif %}
+                    </span>
+
+                    <h3>{{ votacion.titulo }}</h3>
+                    <p>{{ votacion.descripcion|truncatewords:20 }}</p>
+
+                    <p class="poll-date">
+                        Cierre: {{ votacion.fecha_fin|date:"d/m/Y H:i" }}
+                    </p>
+
+                    <a class="btn btn-primary"
+                       href="{% url 'elecciones:lista_votaciones' %}">
+                        Ver votaciones →
+                    </a>
+                </article>
+            {% empty %}
+                <div class="empty-state">
+                    <div class="empty-icon">☑️</div>
+                    <h3>Aún no hay votaciones</h3>
+                    <p>
+                        Cuando se publique una votación, aparecerá aquí.
+                    </p>
+
+                    <a class="btn btn-secondary"
+                       href="{% url 'elecciones:lista_votaciones' %}">
+                        Explorar votaciones
+                    </a>
+
+                    {% if user.is_authenticated %}
+                        <a class="btn btn-primary"
+                           href="{% url 'elecciones:crear_votacion' %}">
+                            Crear mi primera encuesta
+                        </a>
+                    {% endif %}
+                </div>
+            {% endfor %}
+        </div>
+    </section>
+</main>
+
+<footer>
+    <a class="logo footer-logo" href="{% url 'elecciones:inicio' %}">
+        <span class="logo-icon">✓</span> VotaYa
+    </a>
+
+    <p>Tu voz cuenta. Tu participación importa.</p>
+    <small>© 2026 VotaYa · Proyecto académico</small>
+</footer>
+
+</body>
+</html>

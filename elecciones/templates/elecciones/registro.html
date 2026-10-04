@@ -1,0 +1,80 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Crear cuenta | VotaYa</title>
+    <link rel="stylesheet" href="{% static 'css/estilos.css' %}">
+</head>
+<body>
+
+<header class="navbar">
+    <a class="logo" href="{% url 'elecciones:inicio' %}">
+        <span class="logo-icon">✓</span> VotaYa
+    </a>
+
+    <nav>
+        <a href="{% url 'elecciones:inicio' %}">Inicio</a>
+        <a href="{% url 'elecciones:lista_votaciones' %}">Votaciones</a>
+        <a href="{% url 'elecciones:iniciar_sesion' %}">Iniciar sesión</a>
+    </nav>
+</header>
+
+<main class="listing-page">
+    <section class="auth-card">
+        <div class="section-heading">
+            <span class="eyebrow">ÚNETE A VOTAYA</span>
+            <h1>Crear una cuenta</h1>
+            <p>Regístrate para participar en las votaciones.</p>
+        </div>
+
+        <form method="post" class="auth-form">
+            {% csrf_token %}
+
+            {% if form.non_field_errors %}
+                <div class="message error">
+                    {{ form.non_field_errors }}
+                </div>
+            {% endif %}
+
+            {% for field in form %}
+                <div class="form-group">
+                    <label for="{{ field.id_for_label }}">
+                        {{ field.label }}
+                    </label>
+
+                    {{ field }}
+
+                    {% if field.help_text %}
+                        <small class="muted">{{ field.help_text|safe }}</small>
+                    {% endif %}
+
+                    {% for error in field.errors %}
+                        <p class="field-error">{{ error }}</p>
+                    {% endfor %}
+                </div>
+            {% endfor %}
+
+            <button type="submit" class="btn btn-primary">
+                Crear cuenta
+            </button>
+        </form>
+
+        <p class="auth-footer">
+            ¿Ya tienes una cuenta?
+            <a href="{% url 'elecciones:iniciar_sesion' %}">Inicia sesión</a>
+        </p>
+    </section>
+</main>
+
+<footer>
+    <a class="logo footer-logo" href="{% url 'elecciones:inicio' %}">
+        <span class="logo-icon">✓</span> VotaYa
+    </a>
+    <p>Tu voz cuenta. Tu participación importa.</p>
+    <small>© 2026 VotaYa · Proyecto académico</small>
+</footer>
+
+</body>
+</html>

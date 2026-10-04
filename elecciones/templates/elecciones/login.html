@@ -1,0 +1,69 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Iniciar sesión | VotaYa</title>
+    <link rel="stylesheet" href="{% static 'css/estilos.css' %}">
+</head>
+<body>
+<header class="navbar">
+    <a class="logo" href="{% url 'elecciones:inicio' %}">
+        <span class="logo-icon">✓</span> VotaYa
+    </a>
+    <nav>
+        <a href="{% url 'elecciones:inicio' %}">Inicio</a>
+        <a href="{% url 'elecciones:registro' %}">Crear cuenta</a>
+    </nav>
+</header>
+
+<main class="form-page">
+    <section class="form-card">
+        <span class="eyebrow">BIENVENIDO DE NUEVO</span>
+        <h1>Iniciar sesión</h1>
+        <p>Ingresa tus datos para continuar.</p>
+
+        <form method="post">
+            {% csrf_token %}
+
+            {% if form.non_field_errors %}
+                <div class="form-error">
+                    El usuario o la contraseña no son correctos.
+                </div>
+            {% endif %}
+
+            {% for field in form %}
+                <div class="form-group">
+                    <label for="{{ field.id_for_label }}">
+                        {% if field.name == 'username' %}
+                            Nombre de usuario
+                        {% else %}
+                            Contraseña
+                        {% endif %}
+                    </label>
+                    {{ field }}
+
+                    {% for error in field.errors %}
+                        <p class="form-error">{{ error }}</p>
+                    {% endfor %}
+                </div>
+            {% endfor %}
+
+            <button type="submit" class="btn btn-primary form-submit">
+                Iniciar sesión
+            </button>
+        </form>
+
+        <p class="form-bottom">
+            ¿No tienes cuenta?
+            <a href="{% url 'elecciones:registro' %}">Regístrate aquí</a>
+        </p>
+    </section>
+</main>
+
+<footer>
+    <p>© 2026 VotaYa · Tu voz cuenta.</p>
+</footer>
+</body>
+</html>
